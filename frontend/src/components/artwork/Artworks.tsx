@@ -3,7 +3,7 @@ import { getArtworksByCategory, useBatchDeleteArtworkMutation } from "../../api/
 import LoadingPage from "../../pages/LoadingPage"
 import React, { useMemo, useState } from "react"
 import Navbar from "../navbar/Navbar"
-import { useNavigate, useParams } from "react-router-dom"
+import { useLocation, useNavigate, useParams} from "react-router-dom"
 import SearchComponent from "../search/SearchComponent"
 import FileDropzone from "../FileDropzone"
 import { ReactComponent as PlusIcon } from "../../assets/icons/plus.svg"
@@ -13,7 +13,7 @@ import CreateArtwork from "./CreateArtwork"
 import WarningPopup from "../../pages/collections/WarningPopup"
 import CustomDropdown from "../CustomDropdown"
 import { getSingleCollection } from "../../api/collections"
-import FilterDropdown from "../filter/FilterDropdown"
+// import FilterDropdown from "../filter/FilterDropdown"
 import Navigation from "../Navigation"
 import EditCollection from "../../pages/collections/EditCollection"
 import Pagination from "../Pagination"
@@ -25,6 +25,7 @@ const Artworks = () => {
     const [showWarningPopup, setShowWarningPopup] = useState(false)
     const [sortOrder, setSortOrder] = useState<string>("default")
     const [showEditCollection, setShowEditCollection] = useState<boolean>(false)
+    const location = useLocation()
 
     const [currentPage, setCurrentPage] = useState(1)
     const pageSize = 10
@@ -41,8 +42,8 @@ const Artworks = () => {
     ]
 
     const { data: artworkData } = useQuery({
-        queryKey: ["artwork", currentPage, pageSize],
-        queryFn: () => getArtworksByCategory(collection as string, currentPage, pageSize),
+        queryKey: ["artwork", currentPage, pageSize, location.search],
+        queryFn: () => getArtworksByCategory(collection as string, currentPage, pageSize, location.search),
         enabled: !!collection,
         keepPreviousData: true,
     })
@@ -130,9 +131,9 @@ const Artworks = () => {
                         </span>
 
                     <div>
-                        <h3 className="text-lg font-semibold text-gray-800 dark:text-white">{artwork.Tytuł}</h3>
-                        <p className="text-gray-600 dark:text-gray-400 mb-1">{artwork.Artyści}</p>
-                        <p className=" text-gray-500 dark:text-gray-300">{artwork.Rok}</p>
+                        <h3 className="text-lg font-semibold text-gray-800 dark:text-white">{artwork.hasOwnProperty("Tytuł") ? artwork.Tytuł.value : "Tytuł nieznany"}</h3>
+                        <p className="text-gray-600 dark:text-gray-400 mb-1">{artwork.hasOwnProperty("Artyści") ? artwork.Artyści.value : "Artyści nieznani"}</p>
+                        <p className=" text-gray-500 dark:text-gray-300">{ artwork.hasOwnProperty("Rok") ? artwork.Rok.value : "Rok nieznany"}</p>
                     </div>
                 </div>
             </div>
@@ -258,7 +259,7 @@ const Artworks = () => {
             <div className="flex flex-row">
                 <div
                     className="flex mx-auto flex-1 justify-end w-full">
-                    <FilterDropdown />
+                    {/* <FilterDropdown /> */}
                 </div>
                 <div className="w-full flex-2 lg:px-6 max-w-screen-xl">
                     {allArtworks}
